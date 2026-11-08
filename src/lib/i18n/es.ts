@@ -154,6 +154,7 @@ const es: Dict = {
     invalidCredentials: "Correo o contraseña incorrectos.",
     rateLimited: "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
     signupsDisabled: "Los registros nuevos están cerrados. Contacta al equipo de la plataforma.",
+    privateSignup: "Acceso privado: después de crear tu cuenta ingresarás el código de acceso de la comunidad.",
   },
   onboarding: {
     title: "Crea tu negocio",
@@ -163,6 +164,8 @@ const es: Dict = {
     plan: "Plan",
     create: "Crear negocio",
     slugTaken: "Esa URL ya está en uso.",
+    accessCode: "Código de acceso de la comunidad",
+    accessCodeHint: "Lo encuentras dentro de la comunidad (Skool). Pídeselo al admin si no lo tienes.",
     chooseBusiness: "Elige un negocio",
     noBusinesses: "Todavía no perteneces a ningún negocio.",
     invited: "¿Esperas una invitación? Pide al dueño que la envíe a este correo.",
@@ -463,6 +466,8 @@ const es: Dict = {
       csv_export: "Exportación CSV",
     },
     successNote: "¡Gracias! Tu suscripción se actualizará en unos segundos.",
+    communityTitle: "Acceso de comunidad — gratis",
+    communityBody: "Tu negocio está en el plan gratuito de la comunidad. No se requiere suscripción ni tarjeta.",
   },
   settings: {
     title: "Configuración",
@@ -550,6 +555,9 @@ const es: Dict = {
     verifyDomain: "Marcar verificado",
     domains: "Dominios",
     stats: "Uso",
+    accessCode: "Código de acceso de la comunidad",
+    accessCodeHint: "Compártelo en Skool. Quien lo tenga puede crear su propio negocio. Genera uno nuevo para que el código anterior deje de servir (los colaboradores actuales conservan su acceso).",
+    regenerate: "Generar código nuevo",
   },
   customer: {
     rentTitle: "Renta un power bank",
@@ -615,6 +623,11 @@ const es: Dict = {
     perMonth: "/mes",
     perYear: "/año",
     trial: "{n} días de prueba gratis",
+    privateEyebrow: "Herramienta privada de la comunidad",
+    privateTitle: "Opera tu negocio de renta de power banks con la plataforma de la comunidad.",
+    privateSubtitle: "Gratis para colaboradores invitados. Tus estaciones, tu marca y los pagos directo a tu propia cuenta de Stripe.",
+    privateCta: "Tengo un código de acceso",
+    privateNote: "El acceso es solo por invitación. Necesitas el código de acceso de la comunidad para crear tu negocio.",
   },
   errors: {
     MACHINE_NOT_FOUND: "Estación no encontrada.",
@@ -632,6 +645,8 @@ const es: Dict = {
     RATE_LIMITED: "Demasiadas solicitudes. Espera un momento.",
     STRIPE_NOT_CONFIGURED: "Stripe aún no está configurado en esta plataforma.",
     VALIDATION: "Revisa los campos marcados.",
+    INVALID_ACCESS_CODE: "Ese código de acceso no es válido.",
+    SIGNUPS_CLOSED: "El acceso nuevo está cerrado por ahora. Contacta al admin.",
     generic: "Algo salió mal. Inténtalo de nuevo.",
   },
 };

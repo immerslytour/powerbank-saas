@@ -14,6 +14,7 @@ export default async function TenantLayout(props: LayoutProps<"/o/[slug]">) {
   const { t, locale } = await getI18n();
   const base = `/o/${slug}`;
   const isMgr = ctx.rank >= ROLE_RANK.manager;
+  const isFree = (ctx.plan?.price_cents ?? 0) === 0;
   const nav: NavItem[] = [
     { href: base, label: t.nav.overview, icon: "gauge" },
     { href: `${base}/machines`, label: t.nav.machines, icon: "battery" },
@@ -32,7 +33,7 @@ export default async function TenantLayout(props: LayoutProps<"/o/[slug]">) {
         { href: `${base}/team`, label: t.nav.team, icon: "team" },
         { href: `${base}/branding`, label: t.nav.branding, icon: "palette" },
         { href: `${base}/integrations`, label: t.nav.integrations, icon: "plug" },
-        { href: `${base}/subscription`, label: t.nav.subscription, icon: "wallet" },
+        ...(isFree ? [] : ([{ href: `${base}/subscription`, label: t.nav.subscription, icon: "wallet" }] as NavItem[])),
         { href: `${base}/settings`, label: t.nav.settings, icon: "settings" },
         ...(ctx.user.isSuperAdmin ? ([{ href: "/admin", label: t.nav.admin, icon: "shield" }] as NavItem[]) : []),
       ]
@@ -42,14 +43,14 @@ export default async function TenantLayout(props: LayoutProps<"/o/[slug]">) {
   let banner: React.ReactNode = null;
   if (ctx.tenant.status === "suspended") {
     banner = <div className="bg-danger px-4 py-2 text-center text-sm text-white">{t.overview.suspended}</div>;
-  } else if (isMgr && sub && !subscriptionOk(sub, ctx.tenant.status)) {
+  } else if (isMgr && !isFree && sub && !subscriptionOk(sub, ctx.tenant.status)) {
     banner = (
       <div className="bg-warning px-4 py-2 text-center text-sm text-white">
         {t.overview.subscriptionInactive}{" "}
         <Link href={`${base}/subscription`} className="font-semibold underline">{t.subscription.choose}</Link>
       </div>
     );
-  } else if (isMgr && sub?.status === "trialing" && sub.trial_ends_at) {
+  } else if (isMgr && !isFree && sub?.status === "trialing" && sub.trial_ends_at) {
     banner = (
       <div className="border-b border-electric/15 bg-electric-50 px-4 py-2 text-center text-[13px] text-navy-800">
         {fmt(t.overview.trialEnds, { date: formatDate(sub.trial_ends_at, locale, ctx.tenant.timezone) })}{" "}

@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
 import { ActionForm, SubmitButton, fieldError } from "@/components/ui/form";
-import { Field, Input, Select } from "@/components/ui/input";
+import { Field, Input } from "@/components/ui/input";
 import { createBusiness } from "@/lib/actions/onboarding";
 import { slugify } from "@/lib/utils";
 import type { Dict } from "@/lib/i18n/format";
 
-export function CreateBusinessForm({ t, plans, appHost }: { t: Dict; plans: { code: string; label: string }[]; appHost: string }) {
+export function CreateBusinessForm({ t, appHost }: { t: Dict; appHost: string }) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [touched, setTouched] = useState(false);
@@ -39,12 +39,8 @@ export function CreateBusinessForm({ t, plans, appHost }: { t: Dict; plans: { co
               }}
             />
           </Field>
-          <Field label={t.onboarding.plan} htmlFor="plan">
-            <Select id="plan" name="plan" defaultValue={plans[0]?.code}>
-              {plans.map((p) => (
-                <option key={p.code} value={p.code}>{p.label}</option>
-              ))}
-            </Select>
+          <Field label={t.onboarding.accessCode} hint={t.onboarding.accessCodeHint} htmlFor="accessCode" error={fieldError(state, "accessCode")}>
+            <Input id="accessCode" name="accessCode" required autoComplete="off" autoCapitalize="characters" className="font-mono uppercase tracking-widest" />
           </Field>
           <SubmitButton className="w-full" size="lg">{t.onboarding.create}</SubmitButton>
         </>

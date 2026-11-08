@@ -22,6 +22,20 @@ export default async function SubscriptionPage(props: PageProps<"/o/[slug]/subsc
     ctx.supabase.from("machines").select("id", { count: "exact", head: true }).eq("tenant_id", ctx.tenant.id).neq("state", "retired"),
   ]);
   const billing = isStripeConfigured();
+  if ((ctx.plan?.price_cents ?? 0) === 0) {
+    return (
+      <>
+        <PageHeader title={t.subscription.title} />
+        <Card className="max-w-xl">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 text-xl font-semibold">{t.subscription.communityTitle}<Badge tone="green">{ctx.plan?.name}</Badge></div>
+            <p className="mt-2 text-sm text-muted">{t.subscription.communityBody}</p>
+            <div className="mt-4 text-sm">{machineCount ?? 0} / {ctx.plan?.machine_limit ?? 0} {t.subscription.machines}</div>
+          </CardContent>
+        </Card>
+      </>
+    );
+  }
   const currentCode = sub?.plans?.code ?? ctx.plan?.code;
   return (
     <>

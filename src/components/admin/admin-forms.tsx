@@ -4,7 +4,8 @@ import { ActionForm, SubmitButton } from "@/components/ui/form";
 import { Field, Input, Select, Textarea } from "@/components/ui/input";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { createOperator, tenantAdminAction, savePlan, savePlatformSettings, replyTicket, retryWebhook } from "@/lib/actions/admin";
+import { CopyButton } from "@/components/ui/copy-button";
+import { createOperator, tenantAdminAction, savePlan, savePlatformSettings, regenerateAccessCode, replyTicket, retryWebhook } from "@/lib/actions/admin";
 import { slugify, centsToInput } from "@/lib/utils";
 import type { Dict } from "@/lib/i18n/format";
 
@@ -127,5 +128,21 @@ export function RetryWebhookButton({ t, eventId }: { t: Dict; eventId: string })
       <input type="hidden" name="eventId" value={eventId} />
       <SubmitButton size="sm" variant="secondary">{t.admin.retry}</SubmitButton>
     </ActionForm>
+  );
+}
+
+export function AccessCodeCard({ t, code }: { t: Dict; code: string }) {
+  return (
+    <div className="space-y-3">
+      <div className="text-sm font-medium">{t.admin.accessCode}</div>
+      <div className="flex items-center gap-2">
+        <code className="rounded-lg border border-line bg-canvas px-4 py-2 font-mono text-lg tracking-widest">{code || "—"}</code>
+        {code && <CopyButton value={code} label={t.common.copy} copiedLabel={t.common.copied} />}
+      </div>
+      <p className="text-xs text-muted">{t.admin.accessCodeHint}</p>
+      <ActionForm action={regenerateAccessCode}>
+        <SubmitButton variant="secondary">{t.admin.regenerate}</SubmitButton>
+      </ActionForm>
+    </div>
   );
 }

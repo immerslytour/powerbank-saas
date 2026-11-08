@@ -54,6 +54,7 @@ d("RLS tenant isolation", () => {
   beforeAll(async () => {
     db = new Client({ connectionString: url });
     await db.connect();
+    await db.query("update public.plans set is_active = true where code in ('starter', 'growth', 'pro')");
     await createUser("ownerA");
     await createUser("ownerB");
     await createUser("managerA");
@@ -193,7 +194,7 @@ d("RLS tenant isolation", () => {
 
   it("anonymous users can read public plans but no tenant data", async () => {
     const plans = await asUser(null, (c) => c.query("select code from public.plans order by sort_order"));
-    expect(plans.rows.map((r) => r.code)).toEqual(["starter", "growth", "pro"]);
+    expect(plans.rows.map((r) => r.code)).toEqual(["community"]); // paid plans are hidden in community mode
     await expect(asUser(null, (c) => c.query("select * from public.tenants"))).rejects.toThrow(/permission denied/);
   });
 
@@ -280,16 +281,30 @@ d("RLS tenant isolation", () => {
     await expect(asUser(invitee, (c) => c.query("select public.accept_invitation($1)", [token]))).rejects.toThrow(/INVITE_USED/);
   });
 
-  it("self-service tenant creation makes the caller owner with a trial", async () => {
+  it("self-service creation requires the community access code and gets the free plan", async () => {
     const founder = await createUser("founder");
+    const code = (await db.query("select value->>'access_code' c from public.platform_settings where key = 'signups'")).rows[0].c;
+    expect(code).toMatch(/^[0-9A-F]{10}$/);
+    await expect(
+      asUser(founder, (c) => c.query("select public.create_my_tenant('Nope', $1, 'WRONG')", [`nope-${randomBytes(3).toString("hex")}`])),
+    ).rejects.toThrow(/INVALID_ACCESS_CODE/);
     const r = await asUser(founder, (c) =>
-      c.query("select public.create_my_tenant('Founder Co', $1, 'starter') id", [`founder-${randomBytes(3).toString("hex")}`]));
+      c.query("select public.create_my_tenant('Founder Co', $1, $2) id", [`founder-${randomBytes(3).toString("hex")}`, code.toLowerCase()]));
     const tid = r.rows[0].id;
     const m = await db.query("select role from public.memberships where tenant_id = $1 and user_id = $2", [tid, founder.id]);
     expect(m.rows[0].role).toBe("owner");
-    const s = await db.query("select status, trial_ends_at from public.subscriptions where tenant_id = $1", [tid]);
-    expect(s.rows[0].status).toBe("trialing");
-    expect(new Date(s.rows[0].trial_ends_at).getTime()).toBeGreaterThan(Date.now());
+    const s = await db.query("select s.status, p.code, p.price_cents from public.subscriptions s join public.plans p on p.id = s.plan_id where s.tenant_id = $1", [tid]);
+    expect(s.rows[0]).toMatchObject({ status: "active", code: "community", price_cents: 0 });
+    await db.query("update public.platform_settings set value = value || '{\"self_serve_enabled\": false}' where key = 'signups'");
+    await expect(
+      asUser(founder, (c) => c.query("select public.create_my_tenant('Closed', $1, $2)", [`closed-${randomBytes(3).toString("hex")}`, code])),
+    ).rejects.toThrow(/SIGNUPS_CLOSED/);
+    await db.query("update public.platform_settings set value = value || '{\"self_serve_enabled\": true}' where key = 'signups'");
+  });
+
+  it("platform settings (access code) are hidden from operators", async () => {
+    const r = await asUser(users.ownerA, (c) => c.query("select count(*)::int n from public.platform_settings"));
+    expect(r.rows[0].n).toBe(0);
   });
 
   it("service-only functions cannot be called by operators", async () => {

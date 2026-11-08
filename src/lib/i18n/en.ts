@@ -152,6 +152,7 @@ const en = {
     invalidCredentials: "Invalid email or password.",
     rateLimited: "Too many attempts. Please wait a minute and try again.",
     signupsDisabled: "New sign-ups are currently closed. Contact the platform team.",
+    privateSignup: "Private access: after creating your account you’ll enter the community access code.",
   },
   onboarding: {
     title: "Create your business",
@@ -161,6 +162,8 @@ const en = {
     plan: "Plan",
     create: "Create business",
     slugTaken: "That workspace URL is already taken.",
+    accessCode: "Community access code",
+    accessCodeHint: "Find it inside the community (Skool). Ask the admin if you don't have it.",
     chooseBusiness: "Choose a business",
     noBusinesses: "You don't belong to any business yet.",
     invited: "Waiting for an invitation? Ask the business owner to send it to this email.",
@@ -461,6 +464,8 @@ const en = {
       csv_export: "CSV exports",
     },
     successNote: "Thanks! Your subscription will update in a few seconds.",
+    communityTitle: "Community access — free",
+    communityBody: "Your business is on the free community plan. No subscription or card is required.",
   },
   settings: {
     title: "Settings",
@@ -548,6 +553,9 @@ const en = {
     verifyDomain: "Mark verified",
     domains: "Domains",
     stats: "Usage",
+    accessCode: "Community access code",
+    accessCodeHint: "Share this code in Skool. Anyone with it can create their own business. Regenerate it to cut off new sign-ups with the old code (existing collaborators keep access).",
+    regenerate: "Generate new code",
   },
   customer: {
     rentTitle: "Rent a power bank",
@@ -613,6 +621,11 @@ const en = {
     perMonth: "/month",
     perYear: "/year",
     trial: "{n}-day free trial",
+    privateEyebrow: "Private community tool",
+    privateTitle: "Run your power bank rental business with the community’s platform.",
+    privateSubtitle: "Free for invited collaborators. Your stations, your brand, and payments straight to your own Stripe account.",
+    privateCta: "I have an access code",
+    privateNote: "Access is by invitation only. You’ll need the community access code to create your business.",
   },
   errors: {
     MACHINE_NOT_FOUND: "Station not found.",
@@ -630,6 +643,8 @@ const en = {
     RATE_LIMITED: "Too many requests. Please slow down.",
     STRIPE_NOT_CONFIGURED: "Stripe isn't configured on this platform yet.",
     VALIDATION: "Please check the highlighted fields.",
+    INVALID_ACCESS_CODE: "That access code is not valid.",
+    SIGNUPS_CLOSED: "New access is currently closed. Contact the admin.",
     generic: "Something went wrong. Please try again.",
   },
 };

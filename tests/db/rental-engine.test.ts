@@ -65,6 +65,7 @@ d("rental engine (simulator + real Postgres)", () => {
     db = new Client({ connectionString: url });
     await db.connect();
     rpc = pgRpc(db);
+    await db.query("update public.plans set is_active = true where code in ('starter', 'growth', 'pro')");
     const owner = randomUUID();
     await db.query("insert into auth.users (id, email) values ($1, $2)", [owner, `own-${owner.slice(0, 5)}@t.local`]);
     const t = await db.query("select public.provision_tenant('Engine Co', $1, 'pro', $2) id", [

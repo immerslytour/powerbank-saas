@@ -42,6 +42,7 @@ d("stripe webhooks", () => {
     db = new Client({ connectionString: url });
     await db.connect();
     rpc = pgRpc(db);
+    await db.query("update public.plans set is_active = true where code in ('starter', 'growth', 'pro')");
     const owner = randomUUID();
     await db.query("insert into auth.users (id, email) values ($1, $2)", [owner, `wh-${owner.slice(0, 5)}@t.local`]);
     tenantId = (await db.query("select public.provision_tenant('Hook Co', $1, 'growth', $2) id", [`hook-${randomBytes(3).toString("hex")}`, owner])).rows[0].id;

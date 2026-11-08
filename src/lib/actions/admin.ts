@@ -206,9 +206,11 @@ export async function savePlatformSettings(_: ActionState, fd: FormData): Promis
     const actor = await authorizeSuperAdmin();
     const fee = Math.max(0, Math.min(2000, Number(fd.get("application_fee_bps") ?? 0) || 0));
     const admin = createAdminClient();
+    const { data: cur } = await admin.from("platform_settings").select("value").eq("key", "signups").maybeSingle();
+    const prev = (cur?.value ?? {}) as Record<string, unknown>;
     const rows = [
       { key: "payments", value: { application_fee_bps: fee, allow_simulated_payments: fd.get("allow_simulated") === "on" } },
-      { key: "signups", value: { self_serve_enabled: fd.get("self_serve") === "on", default_plan: String(fd.get("default_plan") ?? "starter") } },
+      { key: "signups", value: { ...prev, self_serve_enabled: fd.get("self_serve") === "on", default_plan: String(fd.get("default_plan") ?? "community") } },
       { key: "platform", value: { name: publicEnv.platformName, support_email: String(fd.get("support_email") ?? "") || null, default_locale: "en" } },
     ];
     for (const r of rows) {
@@ -216,6 +218,27 @@ export async function savePlatformSettings(_: ActionState, fd: FormData): Promis
       if (error) throw error;
     }
     await audit({ tenantId: null, actorId: actor.id, actorEmail: actor.email, action: "admin.settings_updated", entityType: "platform_settings", metadata: { application_fee_bps: fee } });
+    revalidatePath("/admin/settings");
+    return { ok: true, message: t.common.saved };
+  } catch (e) {
+    return denied(t, e);
+  }
+}
+
+export async function regenerateAccessCode(_: ActionState, _fd: FormData): Promise<ActionState> {
+  void _fd;
+  const { t } = await getI18n();
+  try {
+    const actor = await authorizeSuperAdmin();
+    const admin = createAdminClient();
+    const { data: cur } = await admin.from("platform_settings").select("value").eq("key", "signups").maybeSingle();
+    const prev = (cur?.value ?? {}) as Record<string, unknown>;
+    const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    const bytes = crypto.getRandomValues(new Uint8Array(10));
+    const code = Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
+    const { error } = await admin.from("platform_settings").upsert({ key: "signups", value: { ...prev, access_code: code } as Json, updated_at: new Date().toISOString(), updated_by: actor.id });
+    if (error) throw error;
+    await audit({ tenantId: null, actorId: actor.id, actorEmail: actor.email, action: "admin.access_code_rotated", entityType: "platform_settings" });
     revalidatePath("/admin/settings");
     return { ok: true, message: t.common.saved };
   } catch (e) {

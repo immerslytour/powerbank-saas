@@ -1,10 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, BatteryCharging, Check, Palette, ShieldCheck, Wallet, BarChart3, MapPin } from "lucide-react";
+import { ArrowRight, BatteryCharging, Palette, ShieldCheck, Wallet, BarChart3, MapPin } from "lucide-react";
 import { getI18n } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n/format";
-import { publicEnv, isSupabaseConfigured } from "@/lib/env";
-import { createClient } from "@/lib/supabase/server";
-import { formatMoney } from "@/lib/utils";
+import { publicEnv } from "@/lib/env";
 import { Logo } from "@/components/shell/logo";
 import { LanguageSwitcher } from "@/components/shell/language-switcher";
 import { Button } from "@/components/ui/button";
@@ -33,9 +31,6 @@ function PhoneMock({ t }: { t: Awaited<ReturnType<typeof getI18n>>["t"] }) {
 
 export default async function Landing() {
   const { t, locale } = await getI18n();
-  const plans = isSupabaseConfigured()
-    ? (await (await createClient()).from("plans").select("code, name, description, price_cents, currency, billing_interval, trial_days, machine_limit, features").eq("is_active", true).eq("is_public", true).order("sort_order")).data ?? []
-    : [];
   const features = [
     { icon: <Palette />, title: t.landing.feature1, body: t.landing.feature1Body },
     { icon: <Wallet />, title: t.landing.feature2, body: t.landing.feature2Body },
@@ -81,30 +76,15 @@ export default async function Landing() {
         </div>
       </section>
 
-      {plans.length > 0 && (
-        <section className="bg-canvas py-20">
-          <div className="mx-auto max-w-6xl px-5">
-            <h2 className="text-center text-3xl font-semibold tracking-tight">{t.landing.pricingTitle}</h2>
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {plans.map((p, i) => (
-                <div key={p.code} className={`rounded-2xl border bg-white p-6 ${i === 1 ? "border-electric shadow-[var(--shadow-pop)]" : "border-line"}`}>
-                  <h3 className="text-lg font-semibold">{p.name}</h3>
-                  <p className="mt-1 min-h-10 text-sm text-muted">{p.description}</p>
-                  <div className="mt-4"><span className="tabular text-4xl font-semibold">{formatMoney(p.price_cents, p.currency, locale)}</span><span className="text-muted">{p.billing_interval === "year" ? t.landing.perYear : t.landing.perMonth}</span></div>
-                  {p.trial_days > 0 && <div className="mt-1 text-xs text-electric">{fmt(t.landing.trial, { n: p.trial_days })}</div>}
-                  <ul className="mt-5 space-y-2 text-sm">
-                    <li className="flex gap-2"><Check className="size-4 text-electric" />{fmt(t.subscription.upTo, { n: p.machine_limit })}</li>
-                    {Object.entries((p.features ?? {}) as Record<string, boolean>).filter(([, v]) => v).map(([k]) => (
-                      <li key={k} className="flex gap-2"><Check className="size-4 text-electric" />{(t.subscription.features as Record<string, string>)[k] ?? k}</li>
-                    ))}
-                  </ul>
-                  <Button asChild className="mt-6 w-full" variant={i === 1 ? "primary" : "secondary"}><Link href="/signup">{t.landing.ctaPrimary}</Link></Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      <section className="bg-canvas py-20">
+        <div className="mx-auto max-w-3xl px-5 text-center">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-electric">{t.landing.privateEyebrow}</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight">{t.landing.privateTitle}</h2>
+          <p className="mt-4 text-muted">{t.landing.privateSubtitle}</p>
+          <Button asChild size="lg" className="mt-8"><Link href="/signup">{t.landing.privateCta}<ArrowRight /></Link></Button>
+          <p className="mt-4 text-xs text-muted">{t.landing.privateNote}</p>
+        </div>
+      </section>
       <footer className="border-t border-line py-8 text-center text-xs text-muted">© {new Date().getFullYear()} {publicEnv.platformName}</footer>
     </div>
   );

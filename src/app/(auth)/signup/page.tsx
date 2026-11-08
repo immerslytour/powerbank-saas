@@ -11,7 +11,7 @@ export default async function SignupPage(props: PageProps<"/signup">) {
   return (
     <>
       <h1 className="text-2xl font-semibold tracking-tight">{t.auth.signUpTitle}</h1>
-      <p className="mb-6 mt-1 text-sm text-muted">{t.auth.signUpSubtitle}</p>
+      <p className="mb-6 mt-1 text-sm text-muted">{t.auth.privateSignup}</p>
       <SignupForm t={t} next={next} />
       <p className="mt-6 text-center text-sm text-muted">
         {t.auth.haveAccount}{" "}

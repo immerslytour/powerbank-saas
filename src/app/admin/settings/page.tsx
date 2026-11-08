@@ -6,7 +6,7 @@ import { stripeMode } from "@/lib/stripe/client";
 import { PageHeader, KeyValue } from "@/components/ui/misc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PlatformSettingsForm } from "@/components/admin/admin-forms";
+import { PlatformSettingsForm, AccessCodeCard } from "@/components/admin/admin-forms";
 
 function Ok({ ok }: { ok: boolean }) {
   return <Badge tone={ok ? "green" : "red"} dot>{ok ? "configured" : "missing"}</Badge>;
@@ -23,6 +23,9 @@ export default async function AdminSettings() {
     <>
       <PageHeader title={t.admin.settingsTitle} />
       <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="lg:col-span-2">
+          <CardContent className="p-6"><AccessCodeCard t={t} code={String(get("signups")?.access_code ?? "")} /></CardContent>
+        </Card>
         <Card>
           <CardContent className="p-6">
             <PlatformSettingsForm
@@ -30,7 +33,7 @@ export default async function AdminSettings() {
               fee={Number(get("payments")?.application_fee_bps ?? 0)}
               allowSim={get("payments")?.allow_simulated_payments !== false}
               selfServe={get("signups")?.self_serve_enabled !== false}
-              defaultPlan={String(get("signups")?.default_plan ?? "starter")}
+              defaultPlan={String(get("signups")?.default_plan ?? "community")}
               supportEmail={String(get("platform")?.support_email ?? "")}
               plans={plans ?? []}
             />
