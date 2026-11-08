@@ -134,7 +134,7 @@ const en = {
     signInTitle: "Welcome back",
     signInSubtitle: "Sign in to manage your power bank network.",
     signUpTitle: "Launch your power bank rental business",
-    signUpSubtitle: "14-day free trial. No card required to start.",
+    signUpSubtitle: "Free access for community collaborators.",
     fullName: "Full name",
     businessName: "Business name",
     password: "Password",
