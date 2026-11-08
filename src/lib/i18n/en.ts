@@ -609,7 +609,7 @@ const en = {
     eyebrow: "Power bank rental platform",
     title: "Run your own branded power bank rental network.",
     subtitle: "Stations, locations, rentals, payouts and analytics — under your brand, with payments going straight to your Stripe account.",
-    ctaPrimary: "Start free trial",
+    ctaPrimary: "Join with access code",
     ctaSecondary: "Sign in",
     feature1: "Your brand, everywhere",
     feature1Body: "Customers see your name, logo and colors from QR scan to receipt.",
