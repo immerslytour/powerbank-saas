@@ -1577,7 +1577,7 @@ export type Database = {
         Returns: boolean
       }
       create_my_tenant: {
-        Args: { p_name: string; p_plan_code?: string; p_slug: string }
+        Args: { p_access_code: string; p_name: string; p_slug: string }
         Returns: string
       }
       data_filter_match: {
