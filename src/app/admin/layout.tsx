@@ -10,6 +10,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const nav: NavItem[] = [
     { href: "/admin", label: t.nav.overview, icon: "gauge" },
     { href: "/admin/tenants", label: t.nav.tenants, icon: "building" },
+    { href: "/admin/users", label: t.nav.users, icon: "users" },
     { href: "/admin/plans", label: t.nav.plans, icon: "layers" },
     { href: "/admin/support", label: t.nav.support, icon: "life" },
     { href: "/admin/webhooks", label: t.nav.webhooks, icon: "webhook" },

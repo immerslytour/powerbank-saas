@@ -283,3 +283,23 @@ export async function retryWebhook(_: ActionState, fd: FormData): Promise<Action
     return denied(t, e);
   }
 }
+
+export async function setUserBlocked(_: ActionState, fd: FormData): Promise<ActionState> {
+  const { t } = await getI18n();
+  try {
+    const actor = await authorizeSuperAdmin();
+    const userId = z.string().uuid().parse(fd.get("userId"));
+    const block = fd.get("block") === "1";
+    const admin = createAdminClient();
+    const { data: target } = await admin.from("profiles").select("id, email, is_super_admin").eq("id", userId).maybeSingle();
+    if (!target) return { ok: false, error: t.errors.generic };
+    if (target.id === actor.id || target.is_super_admin) return { ok: false, error: t.admin.cannotBlock };
+    const { error } = await admin.auth.admin.updateUserById(userId, { ban_duration: block ? "876000h" : "none" });
+    if (error) throw error;
+    await audit({ tenantId: null, actorId: actor.id, actorEmail: actor.email, action: block ? "admin.user_blocked" : "admin.user_unblocked", entityType: "user", entityId: userId, metadata: { email: target.email } });
+    revalidatePath("/admin/users");
+    return { ok: true, message: t.common.saved };
+  } catch (e) {
+    return denied(t, e);
+  }
+}

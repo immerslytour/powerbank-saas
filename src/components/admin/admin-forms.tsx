@@ -5,7 +5,7 @@ import { Field, Input, Select, Textarea } from "@/components/ui/input";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/ui/copy-button";
-import { createOperator, tenantAdminAction, savePlan, savePlatformSettings, regenerateAccessCode, replyTicket, retryWebhook } from "@/lib/actions/admin";
+import { createOperator, tenantAdminAction, savePlan, savePlatformSettings, regenerateAccessCode, setUserBlocked, replyTicket, retryWebhook } from "@/lib/actions/admin";
 import { slugify, centsToInput } from "@/lib/utils";
 import type { Dict } from "@/lib/i18n/format";
 
@@ -145,4 +145,17 @@ export function AccessCodeCard({ t, code }: { t: Dict; code: string }) {
       </ActionForm>
     </div>
   );
+}
+
+export function UserBlockButton({ t, userId, blocked }: { t: Dict; userId: string; blocked: boolean }) {
+  const form = (
+    <ActionForm action={setUserBlocked} showSuccess={false} className="space-y-3">
+      <input type="hidden" name="userId" value={userId} />
+      <input type="hidden" name="block" value={blocked ? "0" : "1"} />
+      {!blocked && <p className="text-sm text-muted">{t.admin.blockConfirm}</p>}
+      <SubmitButton size="sm" variant={blocked ? "primary" : "danger"}>{t.common.confirm}</SubmitButton>
+    </ActionForm>
+  );
+  const label = blocked ? t.admin.unblock : t.admin.block;
+  return <Dialog title={label} trigger={<Button size="sm" variant={blocked ? "primary" : "danger"}>{label}</Button>}>{form}</Dialog>;
 }

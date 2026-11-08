@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, THead, TH, TR, TD } from "@/components/ui/table";
+import { TenantOp } from "@/components/admin/admin-forms";
 import { StatusBadge } from "@/components/ui/status-badge";
 
 export default async function AdminTenants(props: PageProps<"/admin/tenants">) {
@@ -16,7 +17,7 @@ export default async function AdminTenants(props: PageProps<"/admin/tenants">) {
   const q = typeof sp.q === "string" ? sp.q.trim().slice(0, 60) : "";
   const { t, locale } = await getI18n();
   const supabase = await createClient();
-  let query = supabase.from("tenants").select("id, name, slug, status, created_at, plans(name, machine_limit), subscriptions(status), machines(count), locations(count)").order("created_at", { ascending: false }).limit(200);
+  let query = supabase.from("tenants").select("id, name, slug, status, created_at, plans(name, machine_limit), subscriptions(status), memberships(role, profiles(email)), machines(count), locations(count)").order("created_at", { ascending: false }).limit(200);
   if (q) query = query.or(`name.ilike.%${q.replace(/[%,()]/g, "")}%,slug.ilike.%${q.replace(/[%,()]/g, "")}%`);
   const { data } = await query;
   return (
@@ -25,17 +26,23 @@ export default async function AdminTenants(props: PageProps<"/admin/tenants">) {
       <form className="mb-4 max-w-sm"><Input name="q" defaultValue={q} placeholder={t.common.search} /></form>
       <Card>
         <Table>
-          <THead><tr><TH>{t.common.name}</TH><TH>{t.admin.plan}</TH><TH>{t.common.status}</TH><TH>{t.nav.subscription}</TH><TH className="text-right">{t.admin.machines}</TH><TH className="text-right">{t.admin.locations}</TH><TH>{t.common.created}</TH></tr></THead>
+          <THead><tr><TH>{t.common.name}</TH><TH>{t.admin.owner}</TH><TH>{t.admin.plan}</TH><TH>{t.common.status}</TH><TH>{t.nav.subscription}</TH><TH className="text-right">{t.admin.machines}</TH><TH className="text-right">{t.admin.locations}</TH><TH>{t.common.created}</TH><TH></TH></tr></THead>
           <tbody>
             {(data ?? []).map((x) => (
               <TR key={x.id}>
                 <TD><Link href={`/admin/tenants/${x.id}`} className="font-medium hover:text-electric">{x.name}</Link><div className="text-xs text-muted">{x.slug}</div></TD>
+                <TD className="text-sm">{(x.memberships as unknown as { role: string; profiles: { email: string | null } | null }[] | null)?.find((m) => m.role === "owner")?.profiles?.email ?? "—"}</TD>
                 <TD>{x.plans?.name ?? "—"}</TD>
                 <TD><StatusBadge status={x.status} t={t} /></TD>
                 <TD>{x.subscriptions ? <StatusBadge status={x.subscriptions.status} t={t} /> : "—"}</TD>
                 <TD className="tabular text-right">{(x.machines as unknown as { count: number }[])?.[0]?.count ?? 0}{x.plans ? ` / ${x.plans.machine_limit}` : ""}</TD>
                 <TD className="tabular text-right">{(x.locations as unknown as { count: number }[])?.[0]?.count ?? 0}</TD>
                 <TD className="text-muted">{formatDate(x.created_at, locale)}</TD>
+                <TD className="text-right">
+                  {x.status === "active"
+                    ? <TenantOp t={t} tenantId={x.id} op="suspend" label={t.admin.suspend} variant="danger" confirm withReason />
+                    : <TenantOp t={t} tenantId={x.id} op="reactivate" label={t.admin.reactivate} variant="primary" />}
+                </TD>
               </TR>
             ))}
           </tbody>

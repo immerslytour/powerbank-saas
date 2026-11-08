@@ -39,6 +39,19 @@ export default async function TenantLayout(props: LayoutProps<"/o/[slug]">) {
       ]
     : [{ href: `${base}/settings`, label: t.nav.support, icon: "life" }];
 
+  if (ctx.tenant.status === "suspended" && ctx.role !== "super_admin") {
+    return (
+      <div className="grid min-h-dvh place-items-center bg-canvas px-6 text-center">
+        <div className="max-w-md">
+          <h1 className="text-2xl font-semibold">{t.admin.suspendedTitle}</h1>
+          <p className="mt-3 text-muted">{t.admin.suspendedBody}</p>
+          {ctx.tenant.suspended_reason && <p className="mt-3 rounded-lg border border-line bg-white p-3 text-sm">{ctx.tenant.suspended_reason}</p>}
+          <form action={signOut} className="mt-6"><button className="text-sm text-electric underline">{t.common.signOut}</button></form>
+        </div>
+      </div>
+    );
+  }
+
   const { data: sub } = await ctx.supabase.from("subscriptions").select("status, trial_ends_at").eq("tenant_id", ctx.tenant.id).maybeSingle();
   let banner: React.ReactNode = null;
   if (ctx.tenant.status === "suspended") {
