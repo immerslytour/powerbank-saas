@@ -1,26 +1,118 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens — premium fintech: deep navy, clean white, electric blue.
+ * Operator branding overrides --brand / --brand-accent on customer pages only.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --navy-950: #050b1a;
+  --navy-900: #0a1428;
+  --navy-850: #0d1a33;
+  --navy-800: #12213f;
+  --navy-700: #1c2e52;
+  --navy-600: #2a3f68;
+  --ink: #0b1325;
+  --muted: #5b6577;
+  --line: #e6e9f0;
+  --surface: #ffffff;
+  --canvas: #f5f7fb;
+  --electric: #2f7bff;
+  --electric-600: #1f63e0;
+  --electric-50: #eef4ff;
+  --success: #0e9f6e;
+  --warning: #c27c0e;
+  --danger: #d33a4b;
+  --brand: var(--electric);
+  --brand-accent: var(--electric);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-navy-950: var(--navy-950);
+  --color-navy-900: var(--navy-900);
+  --color-navy-850: var(--navy-850);
+  --color-navy-800: var(--navy-800);
+  --color-navy-700: var(--navy-700);
+  --color-navy-600: var(--navy-600);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-surface: var(--surface);
+  --color-canvas: var(--canvas);
+  --color-electric: var(--electric);
+  --color-electric-600: var(--electric-600);
+  --color-electric-50: var(--electric-50);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-brand: var(--brand);
+  --color-brand-accent: var(--brand-accent);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --radius-card: 14px;
+  --shadow-card: 0 1px 0 rgba(11, 19, 37, 0.04), 0 1px 2px rgba(11, 19, 37, 0.06);
+  --shadow-pop: 0 12px 32px -12px rgba(5, 11, 26, 0.28);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle dot grid used on hero / auth backgrounds */
+.bg-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.bg-grid-light {
+  background-image: radial-gradient(rgba(11, 19, 37, 0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.35s ease-out both;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.animate-pulse-dot {
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-pulse-dot {
+    animation: none;
+  }
+}
+
+/* Focus ring */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--electric);
+  outline-offset: 2px;
+  border-radius: 8px;
 }
